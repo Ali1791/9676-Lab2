@@ -60,6 +60,7 @@ do
 
     case "$option" in
         1)
+            echo "$(basename "$file")" >> whitelist
             mv "$file" "$dir/"
             echo "Restored $file to $dir."
             ;;

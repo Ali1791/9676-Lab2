@@ -1,14 +1,13 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]
+if [ $# -ne 2 ]
 then
-    echo "Error: 3 arguments required"
+    echo "Error: 2 arguments required"
     exit 1
 fi
 
 dir=$1
 malicious_dir=$2
-interval_secs=$3
 
 # Check if the directory exists
 if [ ! -d "$dir" ]
@@ -24,12 +23,7 @@ then
     exit 1
 fi
 
-# Check if interval is a positive number
-if ! [[ "$interval_secs" =~ ^[1-9][0-9]*$ ]]
-then
-    echo "Error: interval must be a positive number"
-    exit 1
-fi
+sleep 23
 
 # Scan the directory for malicious files
 scan()
@@ -37,12 +31,12 @@ scan()
     for file in "$dir"/*
     do
         if [[ -f "$file" ]]
-        then    
+        then
             if grep -Fxq "$(basename "$file")" whitelist 2>/dev/null
             then
                 continue
-            fi
-            if [[ "$file" == *.exe || "$file" == *.bat || "$file" == *.vbs || "$file" == *.scr || "$file" == *.ps1 ]] ||grep -qiE 'virus|trojan|malware|worm|ransomware' "$file" 2>/dev/null
+            fi    
+            if [[ "$file" == *.exe || "$file" == *.bat || "$file" == *.vbs || "$file" == *.scr || "$file" == *.ps1 ]] || grep -qiE 'virus|trojan|malware|worm|ransomware' "$file" 2>/dev/null
             then
                 echo "$file is malicious and it is DELETED"
                 cp "$file" "$malicious_dir/"
@@ -56,10 +50,7 @@ if [ ! -f directory-info.last ]
 then
     scan
     ls -l "$dir" > directory-info.last
-fi
-
-while true
-do
+else
     ls -l "$dir" > directory-info.new
 
     if ! cmp -s directory-info.last directory-info.new
@@ -67,6 +58,4 @@ do
         scan
         ls -l "$dir" > directory-info.last
     fi
-
-    sleep "$interval_secs"
-done
+fi
