@@ -29,11 +29,14 @@ scan()
 {
     for file in "$dir"/*
     do
-        if [[ -f "$file" ]] && { [[ "$file" == *.exe || "$file" == *.bat || "$file" == *.vbs || "$file" == *.scr || "$file" == *.ps1 ]] || grep -qiE 'virus|trojan|malware|worm|ransomware' "$file" 2>/dev/null; }
+        if [[ -f "$file" ]]
         then
-            echo "$file is malicious and it is DELETED"
-            cp "$file" "$malicious_dir/"
-            rm "$file"
+            if [[ "$file" == *.exe || "$file" == *.bat || "$file" == *.vbs || "$file" == *.scr || "$file" == *.ps1 ]] ||grep -qiE 'virus|trojan|malware|worm|ransomware' "$file" 2>/dev/null
+            then
+                echo "$file is malicious and it is DELETED"
+                cp "$file" "$malicious_dir/"
+                rm "$file"
+            fi
         fi
     done
 }
@@ -51,7 +54,7 @@ do
     if ! cmp -s directory-info.last directory-info.new
     then
         scan
-        cp directory-info.new directory-info.last
+        ls -l "$dir" > directory-info.last
     fi
 
     sleep "$interval_secs"
